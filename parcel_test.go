@@ -43,28 +43,28 @@ func TestAddGetDelete(t *testing.T) {
 	// add
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 
-	id, err := store.Add(parcel)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, id)
+	p, err := store.Add(parcel)
+	parcel.Number = p
+	require.NoError(t, err)
+	require.NotEmpty(t, p)
 
 	// get
 	// получите только что добавленную посылку, убедитесь в отсутствии ошибки
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
 
-	data, err := store.Get(1)
-	assert.NoError(t, err)
-	assert.Equal(t, parcel, data)
+	gp, err := store.Get(p)
+	require.NoError(t, err)
+	require.Equal(t, parcel, gp)
 
 	// delete
 	// удалите добавленную посылку, убедитесь в отсутствии ошибки
 	// проверьте, что посылку больше нельзя получить из БД
 
-	rr := store.Delete(1)
-	assert.NoError(t, err)
+	err = store.Delete(p)
+	require.NoError(t, err)
 
-	data, err := store.Get(1)
-	assert.NoError(t, err)
-	assert.Equal(t, parcel, data)
+	_, err = store.Get(p)
+	require.ErrorIs(t, err, sql.ErrNoRows)
 }
 
 // TestSetAddress проверяет обновление адреса
